@@ -1,3 +1,4 @@
+
 FROM debian:buster
 
 MAINTAINER danielpmc, <danielpd93@gmail.com>
@@ -5,7 +6,6 @@ MAINTAINER danielpmc, <danielpd93@gmail.com>
 RUN apt update \
     && apt upgrade -y \
     && apt -y install curl software-properties-common locales git \
-    && apt-get install -y default-jre \
     && useradd -d /home/container -m container \
     && apt-get update
 
@@ -34,6 +34,14 @@ RUN apt-get update && \
     # Python 2 & 3
 RUN apt -y install python python-pip python3 python3-pip
 
+    # Java 17
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND teletype
+RUN echo "deb http://ppa.launchpad.net/linuxuprising/java/ubuntu focal main" | tee /etc/apt/sources.list.d/linuxuprising-java.list && \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 73C3DB2A && \
+    apt update
+RUN yes | apt -y install oracle-java17-installer --install-recommends
+
     # Golang
 RUN apt -y install golang
 
@@ -49,3 +57,5 @@ WORKDIR /home/container
 COPY ./entrypoint.sh /entrypoint.sh
 
 CMD ["/bin/bash", "/entrypoint.sh"]
+
+RUN java --version
